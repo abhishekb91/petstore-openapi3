@@ -41,7 +41,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Pet'
+              $ref: '#/components/schemas/PetRequest'
         required: true
       responses:
         201:
@@ -99,16 +99,12 @@ paths:
           type: integer
           format: int64
       requestBody:
+        description: Pet object to update in the store
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              properties:
-                name:
-                  type: string
-                  description: Updated name of the pet
-                status:
-                  type: string
-                  description: Updated status of the pet
+              $ref: '#/components/schemas/PetRequest'
+        required: true
       responses:
         200:
           description: successful operation
@@ -149,6 +145,7 @@ components:
     Error:
       required:
       - message
+      - code
       type: object
       properties:
         code:
@@ -157,13 +154,19 @@ components:
         message:
           type: string
     Pet:
+      allOf:
+        - $ref: '#/components/schemas/PetRequest'
+        - required:
+          - id
+          properties:
+            id:
+              type: integer
+              format: int64
+              description: Unique id of the pet
+    PetRequest:
       required:
-      - name
-      type: object
+        - name
       properties:
-        id:
-          type: integer
-          format: int64
         name:
           type: string
         status:
