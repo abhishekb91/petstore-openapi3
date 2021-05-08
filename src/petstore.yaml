@@ -106,12 +106,8 @@ paths:
               $ref: '#/components/schemas/PetRequest'
         required: true
       responses:
-        200:
+        204:
           description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pet'
         default:
           description: error
           content:
@@ -132,7 +128,7 @@ paths:
           type: integer
           format: int64
       responses:
-        202:
+        204:
           description: Pet deleted
         default:
           description: error
