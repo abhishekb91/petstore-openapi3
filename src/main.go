@@ -1,3 +1,6 @@
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --package=api --generate server,spec -o ./api/petstore-server.gen.go ./petstore.yaml
+//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen --package=api --generate types -o ./api/petstore-type.gen.go ./petstore.yaml
+
 package main
 
 import (
@@ -8,7 +11,8 @@ import (
 	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/rakyll/statik/fs"
 
-	Petstore "github.com/abhishekb91/petstore-openapi3/src/petstore"
+	"github.com/abhishekb91/petstore-openapi3/src/api"
+	"github.com/abhishekb91/petstore-openapi3/src/controller"
 	_ "github.com/abhishekb91/petstore-openapi3/src/statik" //swagger-ui loaded via statik
 )
 
@@ -29,7 +33,7 @@ func main() {
 
 	// Get api specification to parse in swagger-ui.
 	e.GET("docs/openapi.json", func(ctx echo.Context) error {
-		spec, err := Petstore.GetSwagger()
+		spec, err := api.GetSwagger()
 
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -37,6 +41,10 @@ func main() {
 		ctx.JSON(200, spec)
 		return nil
 	})
+
+	//Registering Routes
+	var myApi controller.PetStoreImpl // This implements the pet store interface
+	api.RegisterHandlers(e, &myApi)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
