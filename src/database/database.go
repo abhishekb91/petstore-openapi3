@@ -5,25 +5,24 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"github.com/abhishekb91/petstore-openapi3/src/api"
-	models "github.com/abhishekb91/petstore-openapi3/src/model"
+	"github.com/abhishekb91/petstore-openapi3/src/interfaces"
+	"github.com/abhishekb91/petstore-openapi3/src/models"
 )
 
-type IDataAccessor interface {
-	AddPet(pet *models.Pet) (*api.Pet, *api.Error)
-	GetPets() ([]*api.Pet, *api.Error)
-}
+const (
+	RecordNotFound = "Record not found"
+)
 
-type DataAccessor struct {
+type dataAccessor struct {
 	db             *gorm.DB
-	connectionInfo DBConnection
+	connectionInfo models.DBConnection
 }
 
-func NewDataAccessor() IDataAccessor {
-	return &DataAccessor{}
+func NewDataAccessor() interfaces.IDataAccessor {
+	return &dataAccessor{}
 }
 
-func (da *DataAccessor) connect() error {
+func (da *dataAccessor) connect() error {
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
@@ -34,8 +33,7 @@ func (da *DataAccessor) connect() error {
 	da.db = db
 
 	// Migrate the schema
-	da.db.AutoMigrate(&models.Pet{})
-	da.db.AutoMigrate(&models.Owner{})
+	// da.db.AutoMigrate(&models.Pet{})
 
 	return nil
 }

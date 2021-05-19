@@ -2,10 +2,10 @@ package database
 
 import (
 	"github.com/abhishekb91/petstore-openapi3/src/api"
-	models "github.com/abhishekb91/petstore-openapi3/src/model"
+	"github.com/abhishekb91/petstore-openapi3/src/models"
 )
 
-func (da *DataAccessor) AddPet(pet *models.Pet) (*api.Pet, *api.Error) {
+func (da *dataAccessor) AddPet(pet *models.Pet) (*api.Pet, *api.Error) {
 	err := da.connect()
 	if err != nil {
 		msg := err.Error()
@@ -19,7 +19,7 @@ func (da *DataAccessor) AddPet(pet *models.Pet) (*api.Pet, *api.Error) {
 	return pet.ToModel(), nil
 }
 
-func (da *DataAccessor) GetPets() ([]*api.Pet, *api.Error) {
+func (da *dataAccessor) GetPets() ([]*api.Pet, *api.Error) {
 	err := da.connect()
 	if err != nil {
 		msg := err.Error()
@@ -27,11 +27,73 @@ func (da *DataAccessor) GetPets() ([]*api.Pet, *api.Error) {
 	}
 
 	var pets []models.Pet
+	var response []*api.Pet
 
-	if err := da.db.Preload("LatestOwner").Find(&pets).Error; err != nil {
+	if err := da.db.Find(&pets).Error; err != nil {
 		msg := "Failed to get pets"
 		return nil, &api.Error{Message: msg, Code: 500}
 	}
 
-	return nil, nil
+	for _, pet := range pets {
+		response = append(response, pet.ToModel())
+	}
+
+	return response, nil
+}
+
+func (da *dataAccessor) GetPetById(petId int64) (*api.Pet, *api.Error) {
+	err := da.connect()
+	if err != nil {
+		msg := err.Error()
+		return nil, &api.Error{Message: msg, Code: 500}
+	}
+
+	var pet models.Pet
+
+	if err := da.db.Find(&pet, petId).Error; err != nil {
+		msg := RecordNotFound
+		return nil, &api.Error{Message: msg, Code: 500}
+	}
+
+	if pet.ID == 0 {
+		return nil, &api.Error{Message: RecordNotFound, Code: 404}
+	}
+
+	return pet.ToModel(), nil
+}
+
+func (da *dataAccessor) UpdatePet(petId int64, pet *models.Pet) *api.Error {
+	err := da.connect()
+	if err != nil {
+		msg := err.Error()
+		return &api.Error{Message: msg, Code: 500}
+	}
+
+	petDTO := &models.Pet{}
+	petDTO.ID = uint(petId)
+
+	if err := da.db.Model(&petDTO).Updates(pet).Error; err != nil {
+		msg := RecordNotFound
+		return &api.Error{Message: msg, Code: 500}
+	}
+
+	return nil
+}
+
+func (da *dataAccessor) DeletePet(petId int64) *api.Error {
+	err := da.connect()
+	if err != nil {
+		msg := err.Error()
+		return &api.Error{Message: msg, Code: 500}
+	}
+
+	petDTO := &models.Pet{}
+	petDTO.ID = uint(petId)
+
+	if err := da.db.Delete(&petDTO).Error; err != nil {
+		msg := RecordNotFound
+		return &api.Error{Message: msg, Code: 500}
+	}
+
+	return nil
 }

@@ -7,13 +7,14 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/abhishekb91/petstore-openapi3/src/statik" //swagger-ui loaded via statik
 	"github.com/labstack/echo/v4"
-	echomiddleware "github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/abhishekb91/petstore-openapi3/src/api"
-	"github.com/abhishekb91/petstore-openapi3/src/controller"
-	_ "github.com/abhishekb91/petstore-openapi3/src/statik" //swagger-ui loaded via statik
+	"github.com/abhishekb91/petstore-openapi3/src/controllers"
+	"github.com/abhishekb91/petstore-openapi3/src/database"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 	}
 
 	// Log all requests
-	e.Use(echomiddleware.Logger())
+	e.Use(middleware.Logger())
 
 	// Serve swagger-ui contents over HTTP.
 	sh := http.StripPrefix("/docs/", http.FileServer(statikFS))
@@ -43,8 +44,8 @@ func main() {
 	})
 
 	//Registering Routes
-	var myApi controller.PetStoreImpl // This implements the pet store interface
-	api.RegisterHandlers(e, &myApi)
+	myApi := controllers.NewSvcController(database.NewDataAccessor()) // This implements the pet store interface
+	api.RegisterHandlers(e, myApi)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
