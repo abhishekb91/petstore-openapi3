@@ -5,20 +5,7 @@ import (
 	"github.com/abhishekb91/petstore-openapi3/src/models"
 )
 
-func (da *dataAccessor) AddPet(pet *models.Pet) (*api.Pet, *api.Error) {
-	err := da.connect()
-	if err != nil {
-		msg := err.Error()
-		return nil, &api.Error{Message: msg, Code: 500}
-	}
-
-	if err := da.db.Create(&pet).Error; err != nil {
-		msg := "Failed to create pet for " + pet.Name
-		return nil, &api.Error{Message: msg, Code: 500}
-	}
-	return pet.ToModel(), nil
-}
-
+// GetPets returns all pets from the DB
 func (da *dataAccessor) GetPets() ([]*api.Pet, *api.Error) {
 	err := da.connect()
 	if err != nil {
@@ -41,6 +28,41 @@ func (da *dataAccessor) GetPets() ([]*api.Pet, *api.Error) {
 	return response, nil
 }
 
+// AddPet adds a new pet to the DB
+func (da *dataAccessor) AddPet(pet *models.Pet) (*api.Pet, *api.Error) {
+	err := da.connect()
+	if err != nil {
+		msg := err.Error()
+		return nil, &api.Error{Message: msg, Code: 500}
+	}
+
+	if err := da.db.Create(&pet).Error; err != nil {
+		msg := "Failed to create pet for " + pet.Name
+		return nil, &api.Error{Message: msg, Code: 500}
+	}
+	return pet.ToModel(), nil
+}
+
+// DeletePet deletes a pet from the DB
+func (da *dataAccessor) DeletePet(petId int64) *api.Error {
+	err := da.connect()
+	if err != nil {
+		msg := err.Error()
+		return &api.Error{Message: msg, Code: 500}
+	}
+
+	petDTO := &models.Pet{}
+	petDTO.ID = uint(petId)
+
+	if err := da.db.Delete(&petDTO).Error; err != nil {
+		msg := RecordNotFound
+		return &api.Error{Message: msg, Code: 500}
+	}
+
+	return nil
+}
+
+// GetPetById gets a pet by id from the DB
 func (da *dataAccessor) GetPetById(petId int64) (*api.Pet, *api.Error) {
 	err := da.connect()
 	if err != nil {
@@ -62,6 +84,7 @@ func (da *dataAccessor) GetPetById(petId int64) (*api.Pet, *api.Error) {
 	return pet.ToModel(), nil
 }
 
+// UpdatePetById updates pet in the DB
 func (da *dataAccessor) UpdatePet(petId int64, pet *models.Pet) *api.Error {
 	err := da.connect()
 	if err != nil {
@@ -73,24 +96,6 @@ func (da *dataAccessor) UpdatePet(petId int64, pet *models.Pet) *api.Error {
 	petDTO.ID = uint(petId)
 
 	if err := da.db.Model(&petDTO).Updates(pet).Error; err != nil {
-		msg := RecordNotFound
-		return &api.Error{Message: msg, Code: 500}
-	}
-
-	return nil
-}
-
-func (da *dataAccessor) DeletePet(petId int64) *api.Error {
-	err := da.connect()
-	if err != nil {
-		msg := err.Error()
-		return &api.Error{Message: msg, Code: 500}
-	}
-
-	petDTO := &models.Pet{}
-	petDTO.ID = uint(petId)
-
-	if err := da.db.Delete(&petDTO).Error; err != nil {
 		msg := RecordNotFound
 		return &api.Error{Message: msg, Code: 500}
 	}

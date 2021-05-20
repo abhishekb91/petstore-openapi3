@@ -9,6 +9,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	InvalidPetFormat = "Invalid Pet format"
+)
+
 func NewSvcController(da interfaces.IDataAccessor) *SvcController {
 	return &SvcController{
 		dataAccessor: da,
@@ -19,6 +23,7 @@ type SvcController struct {
 	dataAccessor interfaces.IDataAccessor
 }
 
+// GetPets returns all pets from the DB
 func (c *SvcController) GetPets(ctx echo.Context) error {
 	resp, dbErr := c.dataAccessor.GetPets()
 	if dbErr != nil {
@@ -28,11 +33,12 @@ func (c *SvcController) GetPets(ctx echo.Context) error {
 	return nil
 }
 
+// AddPet adds a new pet to the DB
 func (c *SvcController) AddPet(ctx echo.Context) error {
 	var newPet api.PetRequest
 	err := ctx.Bind(&newPet)
 	if err != nil {
-		return sendPetstoreError(ctx, http.StatusBadRequest, "Invalid Pet format")
+		return sendPetstoreError(ctx, http.StatusBadRequest, InvalidPetFormat)
 	}
 
 	pet := &models.Pet{
@@ -47,13 +53,10 @@ func (c *SvcController) AddPet(ctx echo.Context) error {
 	}
 
 	ctx.JSON(http.StatusCreated, resp)
-	if err != nil {
-		// Something really bad happened, tell Echo that our handler failed
-		return err
-	}
 	return nil
 }
 
+// DeletePet deletes a pet from the DB
 func (c *SvcController) DeletePet(ctx echo.Context, petId int64) error {
 	dbErr := c.dataAccessor.DeletePet(petId)
 	if dbErr != nil {
@@ -63,6 +66,7 @@ func (c *SvcController) DeletePet(ctx echo.Context, petId int64) error {
 	return nil
 }
 
+// GetPetById gets a pet by id from the DB
 func (c *SvcController) GetPetById(ctx echo.Context, petId int64) error {
 	resp, dbErr := c.dataAccessor.GetPetById(petId)
 	if dbErr != nil {
@@ -72,11 +76,12 @@ func (c *SvcController) GetPetById(ctx echo.Context, petId int64) error {
 	return nil
 }
 
+// UpdatePetById updates pet in the DB
 func (c *SvcController) UpdatePetById(ctx echo.Context, petId int64) error {
 	var updatePet api.PetRequest
 	err := ctx.Bind(&updatePet)
 	if err != nil {
-		return sendPetstoreError(ctx, http.StatusBadRequest, "Invalid Pet format")
+		return sendPetstoreError(ctx, http.StatusBadRequest, InvalidPetFormat)
 	}
 
 	pet := models.PetModelToDatabaseObject(updatePet)
@@ -88,10 +93,6 @@ func (c *SvcController) UpdatePetById(ctx echo.Context, petId int64) error {
 	}
 
 	ctx.NoContent(http.StatusNoContent)
-	if err != nil {
-		// Something really bad happened, tell Echo that our handler failed
-		return err
-	}
 	return nil
 }
 
