@@ -4,24 +4,9 @@ import (
 	"net/http"
 
 	"github.com/abhishekb91/petstore-openapi3/src/api"
-	"github.com/abhishekb91/petstore-openapi3/src/interfaces"
 	"github.com/abhishekb91/petstore-openapi3/src/models"
 	"github.com/labstack/echo/v4"
 )
-
-const (
-	InvalidPetFormat = "Invalid Pet format"
-)
-
-func NewSvcController(da interfaces.IDataAccessor) *SvcController {
-	return &SvcController{
-		dataAccessor: da,
-	}
-}
-
-type SvcController struct {
-	dataAccessor interfaces.IDataAccessor
-}
 
 // GetPets returns all pets from the DB
 func (c *SvcController) GetPets(ctx echo.Context) error {
