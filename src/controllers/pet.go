@@ -3,9 +3,10 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/abhishekb91/petstore-openapi3/src/api"
 	"github.com/abhishekb91/petstore-openapi3/src/models"
-	"github.com/labstack/echo/v4"
 )
 
 // GetPets returns all pets from the DB

@@ -16,6 +16,7 @@ The intent of this sample project is to demonstrate the usage of various tools t
 - [swagger-ui](https://github.com/swagger-api/swagger-ui) to display the api document
 - [echo](https://github.com/labstack/echo) as HTTP routing engine
 - [statik](https://github.com/rakyll/statik) to compile static files into a Go binary
+- [mockery](https://github.com/vektra/mockery) to generate mocks from interfaces
 
 ### Prerequisite
 - local golang installation
