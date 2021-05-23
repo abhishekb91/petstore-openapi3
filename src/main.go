@@ -33,7 +33,7 @@ func main() {
 	//Connecting To DB
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("failed to connect database, Error: %v", err)
+		log.Fatalf("[main.main]: Failed to connect database, Error: %v", err)
 	}
 	dbObj, _ := db.DB()
 	defer dbObj.Close()
@@ -51,7 +51,7 @@ func main() {
 	// Start server
 	go func() {
 		if err := e.Start(":8080"); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal("shutting down the server")
+			e.Logger.Fatal("[main.main]: shutting down the server")
 		}
 	}()
 
