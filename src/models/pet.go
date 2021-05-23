@@ -8,7 +8,7 @@ import (
 type Pet struct {
 	gorm.Model
 	Name   string
-	Status string
+	Status string `gorm:"type:enum('available','pending','sold')"`
 }
 
 func (Pet) TableName() string {
