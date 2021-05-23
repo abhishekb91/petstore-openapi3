@@ -4,7 +4,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/abhishekb91/petstore-openapi3/src/interfaces"
-	"github.com/abhishekb91/petstore-openapi3/src/models"
 )
 
 const (
@@ -12,8 +11,7 @@ const (
 )
 
 type dataAccessor struct {
-	db             *gorm.DB
-	connectionInfo models.DBConnection
+	db *gorm.DB
 }
 
 func NewDataAccessor(dbConn *gorm.DB) interfaces.IDataAccessor {
