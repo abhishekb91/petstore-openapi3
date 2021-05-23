@@ -5,23 +5,24 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/abhishekb91/petstore-openapi3/src/models"
-	_ "github.com/abhishekb91/petstore-openapi3/src/statik" //swagger-ui loaded via statik
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/rakyll/statik/fs"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	GormLogger "gorm.io/gorm/logger"
 
 	"github.com/abhishekb91/petstore-openapi3/src/api"
 	"github.com/abhishekb91/petstore-openapi3/src/controllers"
 	"github.com/abhishekb91/petstore-openapi3/src/database"
+	"github.com/abhishekb91/petstore-openapi3/src/models"
+	_ "github.com/abhishekb91/petstore-openapi3/src/statik" //swagger-ui loaded via statik
 )
 
 func main() {
@@ -31,7 +32,9 @@ func main() {
 	e.Use(middleware.Logger())
 
 	//Connecting To DB
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(os.Getenv("DB_CONNECTION")), &gorm.Config{
+		Logger: GormLogger.Default.LogMode(GormLogger.Warn),
+	})
 	if err != nil {
 		log.Fatalf("[main.main]: Failed to connect database, Error: %v", err)
 	}
