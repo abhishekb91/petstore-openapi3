@@ -20,19 +20,31 @@ The intent of this sample project is to demonstrate the usage of various tools t
 
 ### Prerequisite
 - local golang installation
-
+- MySQL Database. Use Makefile to generate MySQL container locally.
 
 ## Development
 
 - Starting Application
-To start-up the application. From the project root, in the terminal:
 
-```bash
-go run src/main.go
-```
+  The service expects database connection to be passed as an environment variable. In order to make local dev easy, there are two options from which one can run the service:
+
+  - From Visual Studio Code:
+    In order to debug the service, one can run the service directly from the Visual Studio Code `Debug and Run` > `Launch` and add breakpoints
+
+  - Using Makefile:
+    From the project Root:
+
+    ```bash
+    make start_service
+    ```
 
 - API End-points
 
-```
-http://localhost:8080/docs/
-```
+  ```
+  http://localhost:8080/docs/
+  ```
+
+- Running Unit Tests
+  ```bash
+  go test ./...
+  ```
